@@ -1,4 +1,6 @@
-void cmnd_dump(String p) {
+#include <AT24CX.h>
+
+void cmnd_dump(String p, int at) {
   int startptr,addh,addl,ofs;
   String q;
   unsigned char romd[16],buf[4];
@@ -12,12 +14,21 @@ void cmnd_dump(String p) {
   } else {
     startptr = 0;
   }
-  Serial.println("LOW CORE DUMP");
+  if (at<0) {
+    Serial.print(F("ARDUINO"));
+  } else {
+    Serial.print(F("AT24C32"));
+  }
+  Serial.println(" EEPROM DUMP");
   Serial.println(F(" ADDR| 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F |0123456789ABCDEF"));
   Serial.println(F("-----+-------------------------------------------------+----------------"));
   for(addh=startptr;addh<(startptr+0x100);addh+=0x10) {
     for(addl=0;addl<0x10;addl++) {
-      romd[addl]=EEPROM.read(addh+addl);
+      if (at<0) {
+	romd[addl]=EEPROM.read(addh+addl);
+      } else {
+	romd[addl]=atmem.read(addh+addl);
+      }
     }
     sprintf(lbf," %03X | %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X |%1c%1c%1c%1c%1c%1c%1c%1c%1c%1c%1c%1c%1c%1c%1c%1c",
 	    addh,romd[0],romd[1],romd[2],romd[3],romd[4],romd[5],romd[6],romd[7],
