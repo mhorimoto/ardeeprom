@@ -4,6 +4,9 @@
 
 #include <avr/pgmspace.h>
 #include <EEPROM.h>
+#include <AT24CX.h>
+
+AT24CX  atmem(7,32);
 
 char cha,cmnd[81],lbf[81];
 int  cp ;
@@ -48,7 +51,9 @@ void loop(void) {
     }
   }
   if (s.indexOf("dump")==0) {
-    cmnd_dump(s);
+    cmnd_dump(s,-1);
+  } else if (s.indexOf("atdump")==0) {
+    cmnd_dump(s,7);
   } else if (s.indexOf("setb")==0) {
     cmnd_setbyte(s);
   } else if (s.indexOf("fill")==0) {
